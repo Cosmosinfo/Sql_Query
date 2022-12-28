@@ -28,6 +28,43 @@ SELECT TFU.USER_ID,
                  WHERE 1 = 1
                    AND USER_ID = TFU.USER_ID
                 ), 0)                                               AS USER_TICKET_COUNT,
-       TO_CHAR(CREATE_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')           AS CREATE_TIMESTAMP
+       TO_CHAR(CREATE_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')           AS CREATE_TIMESTAMP,
+       COALESCE((SELECT
+            SUM(CASE WHEN TICKET_USE_STATUS = 'T' THEN 1
+                 WHEN TICKET_USE_STATUS = 'F' THEN -1
+            END) AS USER_TICKET_COUNT
+            FROM
+                 TB_FULLDIVE_TICKET_HISTORY TH,
+                 TB_FULLDIVE_TICKET T
+        WHERE 1=1
+        AND TH.TICKET_HISTORY_ID = T.TICKET_ID
+        AND T.TICKET_DIVISION = 'E'
+        -- AND USER_ID = 'rOkvL39KSO'
+        ),0) AS USER_TICKET_E_COUNT,
+       COALESCE((SELECT
+            SUM(CASE WHEN TICKET_USE_STATUS = 'T' THEN 1
+                 WHEN TICKET_USE_STATUS = 'F' THEN -1
+            END) AS USER_TICKET_COUNT
+            FROM
+                 TB_FULLDIVE_TICKET_HISTORY TH,
+                 TB_FULLDIVE_TICKET T
+        WHERE 1=1
+        AND TH.TICKET_HISTORY_ID = T.TICKET_ID
+        AND T.TICKET_DIVISION = 'N'
+        -- AND USER_ID = 'rOkvL39KSO'
+        ),0) AS USER_TICKET_N_COUNT,
+       COALESCE((SELECT
+            SUM(CASE WHEN TICKET_USE_STATUS = 'T' THEN 1
+                 WHEN TICKET_USE_STATUS = 'F' THEN -1
+            END) AS USER_TICKET_COUNT
+            FROM
+                 TB_FULLDIVE_TICKET_HISTORY TH,
+                 TB_FULLDIVE_TICKET T
+        WHERE 1=1
+        AND TH.TICKET_HISTORY_ID = T.TICKET_ID
+        AND T.TICKET_DIVISION = 'P'
+        -- AND USER_ID = 'rOkvL39KSO'
+        ),0) AS USER_TICKET_P_COUNT
 FROM TB_FULLDIVE_USER TFU
 WHERE 1 = 1
+;
